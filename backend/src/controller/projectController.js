@@ -17,7 +17,7 @@ export async function createProject(req, res) {
 
     return res.send({
       message: 'Project was created successfully',
-      data: `Project ID that was created is: ${projectId}`,
+      projectId,
     });
   } catch (error) {
     console.log('Error creating the project: ', error);

@@ -1,13 +1,6 @@
-import { usePing } from './hooks/queries/usePing'
-
+import Router from './Router'
 function App() {
-  const { data, isLoading } = usePing()
-
-  if (isLoading) {
-    return <h1>Loading....</h1>
-  }
-
-  return <div>{data.message}</div>
+  return <Router />
 }
 
 export default App

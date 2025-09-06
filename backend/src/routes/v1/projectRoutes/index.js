@@ -3,6 +3,6 @@ import { createProject } from '../../../controller/projectController.js';
 
 const router = express.Router();
 
-router.get('/project', createProject);
+router.post('/project', createProject);
 
 export default router;
