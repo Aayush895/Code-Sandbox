@@ -1,26 +1,37 @@
-import { promisify } from 'util';
-import { exec } from 'child_process';
-import fs from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid';
-
-// takes the function `child_process.exec` and returns a promise of that function
-const execPromise = promisify(exec);
+import {
+  createProjectService,
+  getProjectDirectoryTreeService,
+} from '../services/projectService.js';
 
 export async function createProject(req, res) {
   try {
-    const projectId = uuidv4();
-
-    await fs.mkdir(`./projects/${projectId}`);
-    await execPromise(`npm create vite@latest sandbox -- --template react`, {
-      cwd: `./projects/${projectId}`,
-    });
+    const projectId = await createProjectService();
 
     return res.send({
       message: 'Project was created successfully',
       projectId,
     });
   } catch (error) {
-    console.log('Error creating the project: ', error);
+    console.log('Error in controller layer of createProject func: ', error);
+    throw error;
+  }
+}
+
+export async function getProjectDirectoryTree(req, res) {
+  try {
+    const { projectId } = req.params;
+    const tree = await getProjectDirectoryTreeService(projectId);
+
+    return res.send({
+      success: true,
+      data: tree,
+      message: 'Project directory tree was successfully created',
+    });
+  } catch (error) {
+    console.log(
+      'Error in controller layer of getProjectDirectoryTree func: ',
+      error,
+    );
     throw error;
   }
 }
