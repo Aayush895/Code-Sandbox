@@ -7,10 +7,13 @@ function ProjectDirectoryTree() {
   const { projectId } = useParams()
 
   useEffect(() => {
-    setProjectTreeStruc(projectId)
-  }, [])
+    if (projectTreeStruc) {
+      console.log(projectTreeStruc)
+    } else {
+      setProjectTreeStruc(projectId)
+    }
+  }, [projectTreeStruc, projectId, setProjectTreeStruc])
 
-  console.log('LOG TREE STRUC: ', projectTreeStruc)
   return <div>Tree Structure - {projectId}</div>
 }
 export default ProjectDirectoryTree
