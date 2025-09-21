@@ -14,7 +14,7 @@ export function useLoadTheme(theme) {
         monacoInstance.editor.defineTheme(`${playgroundTheme}`, data)
         monacoInstance.editor.setTheme(`${playgroundTheme}`)
       } catch (error) {
-        if (error?.type === "cancelation") {
+        if (error?.type === 'cancelation') {
           return 'This is a monaco-editor issue. This is an expected behaviour'
         }
         console.log('Error in downloading the playground theme: ', error)

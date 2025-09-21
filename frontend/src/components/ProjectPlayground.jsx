@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import { Typography, Select } from 'antd'
 import { useLoadTheme } from '../hooks/useLoadTheme'
+import ProjectDirectoryTree from './ProjectDirectoryTree'
 
 const { Title } = Typography
 function ProjectPlayground() {
@@ -15,13 +16,13 @@ function ProjectPlayground() {
     setplaygroundTheme(value)
   }
 
-  console.log(`Selected value is: ${playgroundTheme}`)
-
   return (
     <>
       <Title level={1} type="success" style={{ textAlign: 'center' }}>
         Welcome to Project playground - project ID: {projectId}
       </Title>
+
+      <ProjectDirectoryTree />
 
       <Select
         defaultValue={playgroundTheme}
