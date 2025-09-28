@@ -1,13 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Button, Flex, Typography } from 'antd'
+import { Button, Typography } from 'antd'
 import { useCreateProject } from '../hooks/mutations/useCreateProject'
-
-const boxStyle = {
-  width: '100%',
-  height: '100vh',
-  borderRadius: 6,
-  border: '1px solid #40a9ff',
-}
+import styles from '../styles/CreateProject.module.css'
 
 const { Title } = Typography
 
@@ -26,19 +20,37 @@ function CreateProject() {
   }
 
   return (
-    <>
-      <Title level={1} type="success" italic style={{ textAlign: 'center' }}>
+    <div className={styles.container}>
+      <Title
+        level={1}
+        className={styles.header}
+        style={{
+          color: '#40a9ff' /* AntD primary blue */,
+        }}
+      >
         Welcome to code-sandbox
       </Title>
-      <Flex style={boxStyle} justify={'center'} align={'center'} vertical>
-        <Title level={3} type="success" italic code>
-          To create a react-project click on the below button
+
+      <div className={styles.box}>
+        <Title
+          level={3}
+          className={styles.subtitle}
+          style={{ color: '#d4d4d4' /* AntD primary blue */ }}
+        >
+          To create a React project, click the button below
         </Title>
-        <Button type="primary" size="large" onClick={handleProjectCreation}>
+
+        <Button
+          type="primary"
+          size="large"
+          onClick={handleProjectCreation}
+          className={styles.button}
+        >
           Create Project
         </Button>
-      </Flex>
-    </>
+      </div>
+    </div>
   )
 }
+
 export default CreateProject
