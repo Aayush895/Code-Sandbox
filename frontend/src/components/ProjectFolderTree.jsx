@@ -1,14 +1,23 @@
 import { useState } from 'react'
 import { FaFolder, FaFolderOpen, FaFileCode } from 'react-icons/fa'
 import styles from '../styles/ProjectFolderTree.module.css'
+import { useEditorSocketStore } from '../store/useEditorSocketStore'
 
 function ProjectFolderTree({ folderData }) {
   const [foldersVisibility, setFoldersVisibility] = useState({})
+  const { editorSocket } = useEditorSocketStore()
 
   function handleFolderExpansion(folderName) {
     setFoldersVisibility({
       ...foldersVisibility,
       [folderName]: !foldersVisibility[folderName],
+    })
+  }
+
+  // This function should retrieve the contents of a file or boiler-plate code on double click of a file
+  function handleDoubleClickOnFiles() {
+    editorSocket.emit('readFile', {
+      pathToFileOrFolder: folderData?.path,
     })
   }
 
@@ -21,16 +30,31 @@ function ProjectFolderTree({ folderData }) {
             onClick={() => handleFolderExpansion(folderData?.name)}
           >
             {foldersVisibility[folderData?.name] ? (
-              <FaFolderOpen className={styles.folderIcon} title="Open Folder" size={35}/>
+              <FaFolderOpen
+                className={styles.folderIcon}
+                title="Open Folder"
+                size={35}
+              />
             ) : (
-              <FaFolder className={styles.folderIcon} title="Closed Folder" size={35}/>
+              <FaFolder
+                className={styles.folderIcon}
+                title="Closed Folder"
+                size={35}
+              />
             )}{' '}
             <span className={styles.folderName}>{folderData?.name}</span>{' '}
           </div>
         ) : (
-          <div className={styles.fileItem}>
+          <div
+            className={styles.fileItem}
+            onDoubleClick={handleDoubleClickOnFiles}
+          >
             {' '}
-            <FaFileCode className={styles.fileIcon} title="Code File" size={30}/>{' '}
+            <FaFileCode
+              className={styles.fileIcon}
+              title="Code File"
+              size={30}
+            />{' '}
             <span className={styles.fileName}>{folderData?.name}</span>{' '}
           </div>
         )}

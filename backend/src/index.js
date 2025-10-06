@@ -16,15 +16,14 @@ const io = new Server(server, {
   },
 });
 
-io.on('connection', () => {
-  console.log('A user is connected');
-});
-
 let editorNamespace = io.of('/editors');
 editorNamespace.on('connection', (socket) => {
-  console.log('Editor Connected');
+  console.log(
+    'Editor Connected with projectID: ',
+    socket.handshake.query.projectId,
+  );
 
-  let projectId = '123'; // Will write logic to retrieve the actual project id
+  let projectId = socket.handshake.query.projectId; // Will write logic to retrieve the actual project id
   if (projectId) {
     var watcher = chokidar.watch(`./projects/${projectId}`, {
       ignored: (path) => path.includes('node_modules'),
@@ -42,10 +41,10 @@ editorNamespace.on('connection', (socket) => {
 
   handleEditorSocketEvents(socket);
 
-  socket.on('disconnect', async () => {
-    await watcher.close();
-    console.log('Editor disconnected');
-  });
+  // socket.on('disconnect', async () => {
+  //   await watcher.close();
+  //   console.log('Editor disconnected');
+  // });
 });
 
 app.use(express.json());
