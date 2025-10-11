@@ -41,6 +41,7 @@ export function handleEditorSocketEvents(socket) {
       const response = await fs.readFile(pathToFileOrFolder);
       socket.emit('readFileSuccess', {
         data: response.toString(),
+        activeFile: pathToFileOrFolder,
       });
     } catch (error) {
       console.log('Error reading the file: ', error);

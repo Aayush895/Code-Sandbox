@@ -8,21 +8,31 @@ import { useLoadTheme } from '../hooks/useLoadTheme'
 import ProjectFolder from './ProjectFolder'
 import { useEditorSocketStore } from '../store/useEditorSocketStore'
 import styles from '../styles/ProjectPlayground.module.css'
+import { useProjectTreeStore } from '../store/useProjectTreeStore'
+import { useActiveFileStore } from '../store/useActiveFileStore'
 
 const { Title } = Typography
 
 function ProjectPlayground() {
   const [playgroundTheme, setplaygroundTheme] = useState('Dracula')
-  const [fileContent, setFileContent] = useState(
-    '// Welcome to the code playground'
-  )
+
   const { editorSocket, setEditorSocket } = useEditorSocketStore()
+  const { activeFile, setActiveFile } = useActiveFileStore()
+  const { projectTreeStruc } = useProjectTreeStore()
   const { projectId } = useParams()
 
   useLoadTheme(playgroundTheme)
 
   function handleChange(value) {
     setplaygroundTheme(value)
+  }
+
+  function handleWriteFile(value) {
+    console.log(projectTreeStruc)
+    editorSocket.emit('writeFile', {
+      data: value,
+      pathToFileOrFolder: activeFile?.path,
+    })
   }
 
   useEffect(() => {
@@ -36,18 +46,19 @@ function ProjectPlayground() {
         },
       }
     )
-
     setEditorSocket(incomingEditorSocket)
   }, [projectId])
 
   useEffect(() => {
     if (editorSocket) {
       editorSocket.on('readFileSuccess', (data) => {
-        setFileContent(data?.data)
+        setActiveFile(data?.activeFile, data?.data)
+      })
+      editorSocket.on('writeFileSuccess', (data) => {
+        console.log('LOGGING data: ', data)
       })
     }
   }, [editorSocket])
-
   return (
     <div className={styles.playgroundContainer}>
       {' '}
@@ -83,7 +94,12 @@ function ProjectPlayground() {
             defaultLanguage={undefined}
             defaultValue="// Welcome to the code playground"
             theme={playgroundTheme}
-            value={fileContent}
+            value={
+              activeFile?.fileContent
+                ? activeFile?.fileContent
+                : '// Welcome to the code playground'
+            }
+            onChange={handleWriteFile}
           />
         </main>
       </div>
