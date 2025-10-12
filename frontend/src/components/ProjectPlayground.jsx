@@ -8,7 +8,6 @@ import { useLoadTheme } from '../hooks/useLoadTheme'
 import ProjectFolder from './ProjectFolder'
 import { useEditorSocketStore } from '../store/useEditorSocketStore'
 import styles from '../styles/ProjectPlayground.module.css'
-import { useProjectTreeStore } from '../store/useProjectTreeStore'
 import { useActiveFileStore } from '../store/useActiveFileStore'
 
 const { Title } = Typography
@@ -17,8 +16,7 @@ function ProjectPlayground() {
   const [playgroundTheme, setplaygroundTheme] = useState('Dracula')
 
   const { editorSocket, setEditorSocket } = useEditorSocketStore()
-  const { activeFile, setActiveFile } = useActiveFileStore()
-  const { projectTreeStruc } = useProjectTreeStore()
+  const { activeFile } = useActiveFileStore()
   const { projectId } = useParams()
 
   useLoadTheme(playgroundTheme)
@@ -27,12 +25,18 @@ function ProjectPlayground() {
     setplaygroundTheme(value)
   }
 
+  let timerId = null;
   function handleWriteFile(value) {
-    console.log(projectTreeStruc)
-    editorSocket.emit('writeFile', {
-      data: value,
-      pathToFileOrFolder: activeFile?.path,
-    })
+    if (timerId != null) {
+      clearTimeout(timerId)
+    }
+
+    timerId = setTimeout(() => {
+      editorSocket.emit('writeFile', {
+        data: value,
+        pathToFileOrFolder: activeFile?.path,
+      })
+    }, 2000)
   }
 
   useEffect(() => {
@@ -49,16 +53,6 @@ function ProjectPlayground() {
     setEditorSocket(incomingEditorSocket)
   }, [projectId])
 
-  useEffect(() => {
-    if (editorSocket) {
-      editorSocket.on('readFileSuccess', (data) => {
-        setActiveFile(data?.activeFile, data?.data)
-      })
-      editorSocket.on('writeFileSuccess', (data) => {
-        console.log('LOGGING data: ', data)
-      })
-    }
-  }, [editorSocket])
   return (
     <div className={styles.playgroundContainer}>
       {' '}
