@@ -25,7 +25,7 @@ function ProjectPlayground() {
     setplaygroundTheme(value)
   }
 
-  let timerId = null;
+  let timerId = null
   function handleWriteFile(value) {
     if (timerId != null) {
       clearTimeout(timerId)

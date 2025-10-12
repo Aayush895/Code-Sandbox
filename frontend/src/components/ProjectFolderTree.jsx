@@ -16,8 +16,13 @@ function ProjectFolderTree({ folderData }) {
 
   // This function should retrieve the contents of a file or boiler-plate code on double click of a file
   function handleDoubleClickOnFiles() {
+    let fileName = folderData?.path?.split('/')
     editorSocket.emit('readFile', {
       pathToFileOrFolder: folderData?.path,
+    })
+
+    editorSocket.emit('join-file-room', {
+      file: fileName[fileName.length - 1],
     })
   }
 

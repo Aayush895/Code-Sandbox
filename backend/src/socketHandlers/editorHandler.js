@@ -1,11 +1,28 @@
 import fs from 'fs/promises';
 
-export function handleEditorSocketEvents(socket) {
+export function handleEditorSocketEvents(socket, projectId, editorNamespace) {
+  socket.on('join-file-room', async ({ file }) => {
+    const roomId = `id:${projectId}/${file}`;
+    try {
+      socket.join(roomId);
+      console.log('User is connected to room: ', roomId);
+    } catch (error) {
+      console.log('Error in joining the room: ', error);
+      socket.emit('error', {
+        data: 'Error in joining the room',
+      });
+    }
+  });
+
   socket.on('writeFile', async ({ data, pathToFileOrFolder }) => {
+    const files = pathToFileOrFolder?.split('/');
+    const roomId = `id:${projectId}/${files[files.length - 1]}`;
     try {
       const response = await fs.writeFile(pathToFileOrFolder, data);
-      socket.emit('writeFileSuccess', {
-        data: 'File written successfully',
+      editorNamespace.to(roomId).emit('writeFileSuccess', {
+        data: response,
+        file: pathToFileOrFolder,
+        message: 'File written successfully',
       });
     } catch (error) {
       console.log('Error writing the file: ', error);

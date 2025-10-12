@@ -6,13 +6,15 @@ export const useEditorSocketStore = create((set) => {
     editorSocket: null,
     setEditorSocket: (incomingEditorSocket) => {
       const activeFileSetterFn = useActiveFileStore.getState().setActiveFile
-      
+
       incomingEditorSocket?.on('readFileSuccess', (data) => {
         activeFileSetterFn(data?.activeFile, data?.data)
       })
 
       incomingEditorSocket?.on('writeFileSuccess', (data) => {
-        console.log('LOGGING data: ', data)
+        incomingEditorSocket.emit('readFile', {
+          pathToFileOrFolder: data?.file,
+        })
       })
 
       set(() => ({ editorSocket: incomingEditorSocket }))

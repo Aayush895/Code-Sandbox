@@ -39,7 +39,7 @@ editorNamespace.on('connection', (socket) => {
     });
   }
 
-  handleEditorSocketEvents(socket);
+  handleEditorSocketEvents(socket, projectId, editorNamespace);
 
   // socket.on('disconnect', async () => {
   //   await watcher.close();
