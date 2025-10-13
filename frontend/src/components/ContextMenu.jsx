@@ -1,0 +1,13 @@
+import styles from '../styles/ContextMenu.module.css'
+
+function ContextMenu() {
+  return (
+    <div className={styles.contextMenu}>
+      <button className={styles.menuItem}>Delete File</button>
+      <button className={styles.menuItem}>Rename File</button>
+      <button className={styles.menuItem}>Create New File</button>
+      <button className={styles.menuItem}>Create New Folder</button>
+    </div>
+  )
+}
+export default ContextMenu

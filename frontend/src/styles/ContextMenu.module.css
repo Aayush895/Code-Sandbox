@@ -1,0 +1,70 @@
+.contextMenu {
+  position: absolute;
+  background-color: #252526; /* VSCode context menu background */
+  color: #f3f4f6;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+.menuItem {
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menuItem:hover,
+.menuItem:focus {
+  background-color: #37373d; /* Hover highlight (like VSCode) */
+  outline: none;
+}
+
+.menuItem:active {
+  background-color: #2d2d30; /* Active click feedback */
+}
+
+@media (max-width: 768px) {
+  .contextMenu {
+    min-width: 150px;
+    font-size: 0.85rem;
+  }
+
+  .menuItem {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contextMenu {
+    min-width: 130px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+
+  .menuItem {
+    padding: 0.45rem 0.6rem;
+  }
+}
+
+/* Fade-in animation for better UX */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
