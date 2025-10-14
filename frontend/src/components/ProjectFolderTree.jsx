@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { FaFolder, FaFolderOpen, FaFileCode } from 'react-icons/fa'
 import styles from '../styles/ProjectFolderTree.module.css'
 import { useEditorSocketStore } from '../store/useEditorSocketStore'
+import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
 
 function ProjectFolderTree({ folderData }) {
   const [foldersVisibility, setFoldersVisibility] = useState({})
   const { editorSocket } = useEditorSocketStore()
+  const { setxPosition, setyPosition, setisFileContextOpen, setFile } =
+    useFileContextMenuStore()
 
   function handleFolderExpansion(folderName) {
     setFoldersVisibility({
@@ -24,6 +27,15 @@ function ProjectFolderTree({ folderData }) {
     editorSocket.emit('join-file-room', {
       file: fileName[fileName.length - 1],
     })
+  }
+
+  // This function runs on right mouse click and shows the context menu
+  function handleShowContextMenu(e, selectedFile) {
+    e.preventDefault()
+    setxPosition(e.clientX)
+    setyPosition(e.clientY)
+    setisFileContextOpen(true)
+    setFile(selectedFile)
   }
 
   return (
@@ -53,6 +65,7 @@ function ProjectFolderTree({ folderData }) {
           <div
             className={styles.fileItem}
             onDoubleClick={handleDoubleClickOnFiles}
+            onContextMenu={(e) => handleShowContextMenu(e, folderData)}
           >
             {' '}
             <FaFileCode

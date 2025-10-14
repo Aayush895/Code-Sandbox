@@ -9,6 +9,8 @@ import ProjectFolder from './ProjectFolder'
 import { useEditorSocketStore } from '../store/useEditorSocketStore'
 import styles from '../styles/ProjectPlayground.module.css'
 import { useActiveFileStore } from '../store/useActiveFileStore'
+import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
+import ContextMenu from './ContextMenu'
 
 const { Title } = Typography
 
@@ -17,9 +19,15 @@ function ProjectPlayground() {
 
   const { editorSocket, setEditorSocket } = useEditorSocketStore()
   const { activeFile } = useActiveFileStore()
+  const { isFileContextOpen, file, setisFileContextOpen } =
+    useFileContextMenuStore()
   const { projectId } = useParams()
 
   useLoadTheme(playgroundTheme)
+
+  function handleHideContextMenu() {
+    setisFileContextOpen(false)
+  }
 
   function handleChange(value) {
     setplaygroundTheme(value)
@@ -54,7 +62,7 @@ function ProjectPlayground() {
   }, [projectId])
 
   return (
-    <div className={styles.playgroundContainer}>
+    <div className={styles.playgroundContainer} onClick={handleHideContextMenu}>
       {' '}
       <Title level={3} className={styles.playgroundTitle}>
         Welcome to Project Playground — Project ID: {projectId}{' '}
@@ -62,6 +70,7 @@ function ProjectPlayground() {
       <div className={styles.playgroundContent}>
         {/* Left Sidebar: Folder Tree */}
         <aside className={styles.folderSidebar}>
+          {isFileContextOpen && file && <ContextMenu />}
           <ProjectFolder />
         </aside>
 
