@@ -11,6 +11,7 @@ import styles from '../styles/ProjectPlayground.module.css'
 import { useActiveFileStore } from '../store/useActiveFileStore'
 import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
 import ContextMenu from './ContextMenu'
+import { useActiveFolderStore } from '../store/useActiveFolderStore'
 
 const { Title } = Typography
 
@@ -19,14 +20,28 @@ function ProjectPlayground() {
 
   const { editorSocket, setEditorSocket } = useEditorSocketStore()
   const { activeFile } = useActiveFileStore()
-  const { isFileContextOpen, file, setisFileContextOpen } =
+  const { isFileContextOpen, file, setisFileContextOpen, setFile } =
     useFileContextMenuStore()
+  const { isFolderContextOpen, setisFolderContextOpen, folder, setFolder } =
+    useActiveFolderStore()
+
   const { projectId } = useParams()
 
   useLoadTheme(playgroundTheme)
 
   function handleHideContextMenu() {
-    setisFileContextOpen(false)
+    // TODO: Below commented code generates a bug for context menus. Please use the debugger in order to learn how to use the debugger and debug the code
+    // isFileContextOpen && setisFileContextOpen(false)
+    // isFolderContextOpen && setisFolderContextOpen(false)
+
+    if (isFileContextOpen) {
+      setisFileContextOpen(false)
+      setFile(null)
+    }
+    if (isFolderContextOpen) {
+      setisFolderContextOpen(false)
+      setFolder(null)
+    }
   }
 
   function handleChange(value) {
@@ -70,7 +85,9 @@ function ProjectPlayground() {
       <div className={styles.playgroundContent}>
         {/* Left Sidebar: Folder Tree */}
         <aside className={styles.folderSidebar}>
-          {isFileContextOpen && file && <ContextMenu />}
+          {((isFileContextOpen && file) || (isFolderContextOpen && folder)) && (
+            <ContextMenu />
+          )}
           <ProjectFolder />
         </aside>
 

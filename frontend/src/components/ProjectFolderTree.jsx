@@ -3,12 +3,16 @@ import { FaFolder, FaFolderOpen, FaFileCode } from 'react-icons/fa'
 import styles from '../styles/ProjectFolderTree.module.css'
 import { useEditorSocketStore } from '../store/useEditorSocketStore'
 import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
+import { useActiveFolderStore } from '../store/useActiveFolderStore'
 
 function ProjectFolderTree({ folderData }) {
   const [foldersVisibility, setFoldersVisibility] = useState({})
   const { editorSocket } = useEditorSocketStore()
   const { setxPosition, setyPosition, setisFileContextOpen, setFile } =
     useFileContextMenuStore()
+
+  const { setxCoordinate, setyCoordinate, setisFolderContextOpen, setFolder } =
+    useActiveFolderStore()
 
   function handleFolderExpansion(folderName) {
     setFoldersVisibility({
@@ -30,12 +34,21 @@ function ProjectFolderTree({ folderData }) {
   }
 
   // This function runs on right mouse click and shows the context menu
-  function handleShowContextMenu(e, selectedFile) {
+  function handleShowContextMenu(e, clickedFolderOrFile) {
+    console.log(clickedFolderOrFile)
     e.preventDefault()
-    setxPosition(e.clientX)
-    setyPosition(e.clientY)
-    setisFileContextOpen(true)
-    setFile(selectedFile)
+    clickedFolderOrFile?.children
+      ? setxCoordinate(e.clientX)
+      : setxPosition(e.clientX)
+    clickedFolderOrFile?.children
+      ? setyCoordinate(e.clientY)
+      : setyPosition(e.clientY)
+    clickedFolderOrFile?.children
+      ? setisFolderContextOpen(true)
+      : setisFileContextOpen(true)
+    clickedFolderOrFile?.children
+      ? setFolder(clickedFolderOrFile)
+      : setFile(clickedFolderOrFile)
   }
 
   return (
@@ -45,6 +58,7 @@ function ProjectFolderTree({ folderData }) {
           <div
             className={styles.folderItem}
             onClick={() => handleFolderExpansion(folderData?.name)}
+            onContextMenu={(e) => handleShowContextMenu(e, folderData)}
           >
             {foldersVisibility[folderData?.name] ? (
               <FaFolderOpen
