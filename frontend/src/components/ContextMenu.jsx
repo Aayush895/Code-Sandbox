@@ -1,11 +1,25 @@
+import { useEditorSocketStore } from '../store/useEditorSocketStore'
 import { useActiveFolderStore } from '../store/useActiveFolderStore'
 import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
 import styles from '../styles/ContextMenu.module.css'
 
 function ContextMenu() {
-  const { xPosition, yPosition } = useFileContextMenuStore()
+  const { editorSocket } = useEditorSocketStore()
+  const { xPosition, yPosition, file } = useFileContextMenuStore()
   const { xCoordinate, yCoordinate, isFolderContextOpen, folder } =
     useActiveFolderStore()
+
+  function handleDeleteFolder(e) {
+    e.preventDefault()
+    editorSocket?.emit('deleteFolder', { pathToFileOrFolder: folder?.path })
+  }
+
+  function handleDeleteFile(e) {
+    console.log('LOGGING file: ', file)
+    e.preventDefault()
+    editorSocket?.emit('deleteFile', { pathToFileOrFolder: file?.path })
+  }
+
   return (
     <div
       className={styles.contextMenu}
@@ -15,7 +29,12 @@ function ContextMenu() {
         left: `${isFolderContextOpen ? xCoordinate : xPosition}px`,
       }}
     >
-      <button className={styles.menuItem}>
+      <button
+        className={styles.menuItem}
+        onClick={(e) =>
+          folder?.children ? handleDeleteFolder(e) : handleDeleteFile(e)
+        }
+      >
         {folder?.children ? 'Delete Folder' : 'Delete File'}
       </button>
       <button className={styles.menuItem}>

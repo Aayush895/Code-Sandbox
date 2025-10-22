@@ -72,7 +72,8 @@ export function handleEditorSocketEvents(socket, projectId, editorNamespace) {
     try {
       const response = await fs.unlink(pathToFileOrFolder);
       socket.emit('deleteFileSuccess', {
-        data: 'File deleted successfully',
+        projectId: projectId,
+        message: 'File deleted successfully',
       });
     } catch (error) {
       console.log('Error deleting the file: ', error);
@@ -100,7 +101,8 @@ export function handleEditorSocketEvents(socket, projectId, editorNamespace) {
     try {
       const response = await fs.rmdir(pathToFileOrFolder, { recursive: true });
       socket.emit('deleteFolderSuccess', {
-        data: 'Folder was deleted successfully',
+        projectId: projectId,
+        message: 'Folder deleted successfully',
       });
     } catch (error) {
       console.log('Error in deleting the folder: ', error);

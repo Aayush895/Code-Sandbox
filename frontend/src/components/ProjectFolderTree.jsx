@@ -35,7 +35,6 @@ function ProjectFolderTree({ folderData }) {
 
   // This function runs on right mouse click and shows the context menu
   function handleShowContextMenu(e, clickedFolderOrFile) {
-    console.log(clickedFolderOrFile)
     e.preventDefault()
     clickedFolderOrFile?.children
       ? setxCoordinate(e.clientX)
