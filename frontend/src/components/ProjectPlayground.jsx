@@ -12,6 +12,7 @@ import { useActiveFileStore } from '../store/useActiveFileStore'
 import { useFileContextMenuStore } from '../store/useFileContextMenuStore'
 import ContextMenu from './ContextMenu'
 import { useActiveFolderStore } from '../store/useActiveFolderStore'
+import BrowserTerminal from './BrowserTerminal'
 
 const { Title } = Typography
 
@@ -121,6 +122,7 @@ function ProjectPlayground() {
             }
             onChange={handleWriteFile}
           />
+          <BrowserTerminal />
         </main>
       </div>
     </div>

@@ -6,6 +6,7 @@ import cors from 'cors';
 import { PORT } from './config/serverConfig.js';
 import apiRouter from '../src/routes/index.js';
 import { handleEditorSocketEvents } from './socketHandlers/editorHandler.js';
+import { handleContainerCreate } from './containers/handleContainerCreation.js';
 
 const app = express();
 const server = createServer(app);
@@ -24,6 +25,7 @@ editorNamespace.on('connection', (socket) => {
   );
 
   let projectId = socket.handshake.query.projectId; // Will write logic to retrieve the actual project id
+
   if (projectId) {
     var watcher = chokidar.watch(`./projects/${projectId}`, {
       ignored: (path) => path.includes('node_modules'),
@@ -45,6 +47,18 @@ editorNamespace.on('connection', (socket) => {
   //   await watcher.close();
   //   console.log('Editor disconnected');
   // });
+});
+
+let terminalNamespace = io.of('/terminal');
+terminalNamespace.on('connection', (socket) => {
+  let projectId = socket.handshake.query.projectId;
+  // handleTerminalHandlers(socket);
+
+  socket.on('disconnect', () => {
+    console.log('Client terminal disconnected');
+  });
+
+  handleContainerCreate(projectId, socket);
 });
 
 app.use(express.json());
