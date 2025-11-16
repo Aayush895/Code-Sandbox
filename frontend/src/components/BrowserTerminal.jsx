@@ -1,19 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
-import { io } from 'socket.io-client'
+import { AttachAddon } from '@xterm/addon-attach'
 import '@xterm/xterm/css/xterm.css'
 import { useParams } from 'react-router-dom'
 
 function BrowserTerminal() {
   const terminalRef = useRef(null)
-  const terminalSocket = useRef(null)
-  const {projectId} = useParams()
+  const { projectId } = useParams()
   useEffect(() => {
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 16,
-      fontFamily: 'Ubuntu mono',
+      fontFamily: 'Fira Code',
       convertEol: true,
       theme: {
         background: '#282a37',
@@ -32,27 +32,17 @@ function BrowserTerminal() {
     term.loadAddon(fitAddon)
     fitAddon.fit()
 
-    terminalSocket.current = io(
-      `${import.meta.env.VITE_BACKEND_URL}/terminal`,
-      {
-        query: {
-          projectId,
-        },
-      }
+    const ws = new WebSocket(
+      'ws://localhost:3000/terminal?projectId=' + projectId
     )
 
-    terminalSocket.current.on('shell-output', (data) => {
-      term.write(data)
-    })
-
-    term.onData((data) => {
-      console.log('LOGGING TERMINAL DATA: ', data)
-      terminalSocket.current.emit('shell-input', data)
-    })
+    ws.onopen = () => {
+      const attachAddon = new AttachAddon(ws)
+      term.loadAddon(attachAddon)
+    }
 
     return () => {
       term.dispose()
-      terminalSocket.current.disconnect()
     }
   }, [])
 
