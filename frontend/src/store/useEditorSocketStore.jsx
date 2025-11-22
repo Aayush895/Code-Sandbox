@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { useActiveFileStore } from './useActiveFileStore'
 import { useProjectTreeStore } from './useProjectTreeStore'
+import { usePortStore } from './usePortStore'
 
 export const useEditorSocketStore = create((set) => {
   return {
@@ -9,6 +10,8 @@ export const useEditorSocketStore = create((set) => {
       const activeFileSetterFn = useActiveFileStore.getState().setActiveFile
       const setProjectTreeStructure =
         useProjectTreeStore.getState().setProjectTreeStruc
+
+      const setContainerPort = usePortStore.getState().setPort
 
       incomingEditorSocket?.on('readFileSuccess', (data) => {
         activeFileSetterFn(data?.activeFile, data?.data)
@@ -26,6 +29,10 @@ export const useEditorSocketStore = create((set) => {
 
       incomingEditorSocket?.on('deleteFileSuccess', (data) => {
         setProjectTreeStructure(data?.projectId)
+      })
+
+      incomingEditorSocket?.on('getPortSuccess', ({ port }) => {
+        setContainerPort(port)
       })
 
       set(() => ({ editorSocket: incomingEditorSocket }))

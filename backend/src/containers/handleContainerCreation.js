@@ -2,30 +2,43 @@ import Docker from 'dockerode';
 
 const docker = new Docker();
 
-export const handleContainerCreate = async (
-  projectId,
-  terminalWebSocket,
-  req,
-  tcpSocket,
-  head,
-) => {
+export const handleContainerCreate = async (projectId) => {
+  console.log('Project id received for container create', projectId);
   try {
-    console.log('Project id received for container creation: ', projectId);
+    // Delete any existing container running with same name
+    const existingContainer = await docker.listContainers({
+      name: projectId,
+    });
+
+    console.log('Existing container', existingContainer);
+
+    if (existingContainer.length > 0) {
+      console.log('Container already exists, stopping and removing it');
+      const container = docker.getContainer(existingContainer[0].Id);
+      await container.remove({ force: true });
+    }
+
+    console.log('Creating a new container');
+
     const container = await docker.createContainer({
       Image: 'sandbox', // name given by us for the written dockerfile
       AttachStdin: true,
       AttachStdout: true,
       AttachStderr: true,
       Cmd: ['/bin/bash'],
+      name: projectId,
       Tty: true,
       User: 'sandbox',
       Volumes: {
-        '/home/sandbox/app': {}
+        '/home/sandbox/app': {},
       },
-      // HostConfig is responsible for attaching the host machine or server machine with docker container when container is created
+      ExposedPorts: {
+        '5173/tcp': {},
+      },
+      Env: ['HOST=0.0.0.0'],
       HostConfig: {
         Binds: [
-          // Mounting the project directory to the container
+          // mounting the project directory to the container
           `${process.cwd()}/projects/${projectId}:/home/sandbox/app`,
         ],
         PortBindings: {
@@ -36,26 +49,38 @@ export const handleContainerCreate = async (
           ],
         },
       },
-      ExposedPorts: {
-        '5173/tcp': {},
-      },
-      Env: ['Host=0.0.0.0'],
     });
 
-    console.log('Docker container created: ', container.id);
-    await container.start();
-    console.log('Docker container started successfully');
+    console.log('Container created', container.id);
 
-    // Upgrading the connection from http to socket connection once the docker container has been created
-    terminalWebSocket.handleUpgrade(
-      req,
-      tcpSocket,
-      head,
-      (establishedWSConn) => {
-        terminalWebSocket.emit('connection', establishedWSConn, req, container);
-      },
-    );
+    await container.start();
+
+    console.log('container started');
+
+    // Below is the place where we upgrade the connection to websocket
+    // terminalSocket.handleUpgrade(req, tcpSocket, head, (establishedWSConn) => {
+    //     console.log("Connection upgraded to websocket");
+    //     terminalSocket.emit("connection", establishedWSConn, req, container);
+    // });
+
+    return container;
   } catch (error) {
     console.log('Error while creating the docker container: ', error);
   }
 };
+
+export async function getContainerPort(containerName) {
+  const container = await docker.listContainers({
+    name: containerName,
+  });
+
+  if (container.length > 0) {
+    const containerInfo = await docker.getContainer(container[0].Id).inspect();
+    try {
+      return containerInfo?.NetworkSettings?.Ports['5173/tcp'][0].HostPort;
+    } catch (error) {
+      console.log('port not present');
+      return undefined;
+    }
+  }
+}

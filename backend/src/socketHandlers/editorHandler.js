@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import {getContainerPort} from '../containers/handleContainerCreation.js'
 
 export function handleEditorSocketEvents(socket, projectId, editorNamespace) {
   socket.on('join-file-room', async ({ file }) => {
@@ -110,6 +111,14 @@ export function handleEditorSocketEvents(socket, projectId, editorNamespace) {
         data: 'Error in deleting the folder',
       });
     }
+  });
+
+  socket.on('getPort', async ({ containerName }) => {
+    const port = await getContainerPort(containerName);
+    console.log('port data', port);
+    socket.emit('getPortSuccess', {
+      port: port,
+    });
   });
 
   // TODO: Write an event to support renaming the file

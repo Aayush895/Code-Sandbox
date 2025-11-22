@@ -5,10 +5,12 @@ import { FitAddon } from '@xterm/addon-fit'
 import { AttachAddon } from '@xterm/addon-attach'
 import '@xterm/xterm/css/xterm.css'
 import { useParams } from 'react-router-dom'
+import { useTerminalStore } from '../store/useTerminalStore'
 
 function BrowserTerminal() {
   const terminalRef = useRef(null)
   const { projectId } = useParams()
+  const { setTerminalSocket } = useTerminalStore()
   useEffect(() => {
     const term = new Terminal({
       cursorBlink: true,
@@ -33,8 +35,10 @@ function BrowserTerminal() {
     fitAddon.fit()
 
     const ws = new WebSocket(
-      'ws://localhost:3000/terminal?projectId=' + projectId
+      'ws://localhost:4000/terminal?projectId=' + projectId
     )
+
+    setTerminalSocket(ws)
 
     ws.onopen = () => {
       const attachAddon = new AttachAddon(ws)
